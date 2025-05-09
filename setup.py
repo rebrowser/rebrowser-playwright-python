@@ -119,7 +119,7 @@ def prepare_rebrowser_sources():
 def replace_driver_with_rebrowser(path: str):
     package_folder = path + "/package"
     package_name = "rebrowser-playwright-core"
-    package_version = "1.49.1"
+    package_version = "1.52.0"
     
     print(f"[rebrowser-patches] package_version = {package_version}, path = {path}")
     
