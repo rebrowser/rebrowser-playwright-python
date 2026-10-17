@@ -134,23 +134,30 @@ def _extract_zip_file(archive: zipfile.ZipFile, name: str, destination: Path) ->
 
 def fetch_playwright_core(version: str, work_dir: Path) -> Path:
     """Download playwright-core@<version> and extract its package/ tree once."""
-    npm = "npm.cmd" if sys.platform == "win32" else "npm"
-    spec = f"playwright-core@{version}"
-    # npm is run from the repository root so that a root-level .npmrc (registry
-    # and credentials) is honoured. `npm pack` writes <name>-<version>.tgz.
-    print(f"Downloading {spec} with npm pack", flush=True)
-    try:
-        subprocess.check_call(
-            [npm, "pack", spec, "--pack-destination", str(work_dir)],
-            cwd=REPO_ROOT,
-        )
-    except FileNotFoundError:
-        raise SystemExit(
-            "npm was not found on PATH; Node.js/npm are required to assemble the driver."
-        )
-    except subprocess.CalledProcessError as error:
-        raise SystemExit(f"npm pack {spec} failed with exit code {error.returncode}")
     tgz = work_dir / f"playwright-core-{version}.tgz"
+    # rebrowser-patches: REBROWSER_DRIVER_TGZ points at the locally built, patched
+    # rebrowser-playwright-core tarball, which is used instead of npm's playwright-core.
+    local_tgz = os.environ.get("REBROWSER_DRIVER_TGZ")
+    if local_tgz:
+        print(f"Using local driver tarball {local_tgz}", flush=True)
+        shutil.copyfile(local_tgz, tgz)  # copied: the extraction below unlinks it
+    else:
+        npm = "npm.cmd" if sys.platform == "win32" else "npm"
+        spec = f"playwright-core@{version}"
+        # npm is run from the repository root so that a root-level .npmrc (registry
+        # and credentials) is honoured. `npm pack` writes <name>-<version>.tgz.
+        print(f"Downloading {spec} with npm pack", flush=True)
+        try:
+            subprocess.check_call(
+                [npm, "pack", spec, "--pack-destination", str(work_dir)],
+                cwd=REPO_ROOT,
+            )
+        except FileNotFoundError:
+            raise SystemExit(
+                "npm was not found on PATH; Node.js/npm are required to assemble the driver."
+            )
+        except subprocess.CalledProcessError as error:
+            raise SystemExit(f"npm pack {spec} failed with exit code {error.returncode}")
     if not tgz.is_file():
         raise SystemExit(f"npm pack did not produce {tgz}")
     with tarfile.open(tgz, "r:gz") as tar:
