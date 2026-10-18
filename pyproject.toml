@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools==82.0.1", "setuptools-scm==10.3.4", "wheel==0.48.0", "auditwheel==6.7.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "playwright"
+description = "A high-level API to automate web browsers"
+authors = [
+    {name = "Microsoft Corporation"}
+]
+readme = "README.md"
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">=3.10"
+# Please when changing dependencies run the following commands to update requirements.txt:
+# - pip install uv==0.5.4
+# - uv pip compile pyproject.toml -o requirements.txt
+dependencies = [
+    "pyee>=13,<15",
+    "greenlet>=3.1.1,<4.0.0"
+]
+classifiers = [
+    "Topic :: Software Development :: Testing",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://github.com/Microsoft/playwright-python"
+"Release notes" = "https://github.com/microsoft/playwright-python/releases"
+
+[project.scripts]
+playwright = "playwright.__main__:main"
+
+[project.entry-points.pyinstaller40]
+hook-dirs = "playwright._impl.__pyinstaller:get_hook_dirs"
+
+[tool.setuptools]
+packages = [
+    "playwright",
+    "playwright.async_api",
+    "playwright.sync_api",
+    "playwright._impl",
+    "playwright._impl.__pyinstaller",
+]
+include-package-data = true
+
+[tool.setuptools_scm]
+version_file = "playwright/_repo_version.py"
+
+[tool.pytest.ini_options]
+addopts = "-Wall -rsx -vv -s"
+markers = [
+    "skip_browser",
+    "only_browser",
+    "skip_platform",
+    "only_platform"
+]
+junit_family = "xunit2"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.10"
+warn_unused_ignores = false
+warn_redundant_casts = true
+warn_unused_configs = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = false
+exclude = [
+    "build/",
+    "env/",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.pyright]
+include = ["playwright", "tests", "scripts"]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "./build"]
+pythonVersion = "3.10"
+reportMissingImports = false
+reportTypedDictNotRequiredAccess = false
+reportCallInDefaultInitializer = true
+reportOptionalSubscript = false
+reportUnboundVariable = false
+strictParameterNoneValue = false
+reportIncompatibleVariableOverride = false
