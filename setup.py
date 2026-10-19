@@ -123,7 +123,7 @@ class PlaywrightBDistWheelCommand(BDistWheelCommand):
     def run(self) -> None:
         super().run()
         os.makedirs("driver", exist_ok=True)
-        os.makedirs("playwright/driver", exist_ok=True)
+        os.makedirs("rebrowser_playwright/driver", exist_ok=True)
         self._download_and_extract_local_driver()
 
         wheel = None
@@ -173,9 +173,9 @@ class PlaywrightBDistWheelCommand(BDistWheelCommand):
                 for file in files:
                     from_path = os.path.join(dir_path, file)
                     to_path = os.path.relpath(from_path, driver_root)
-                    zip.write(from_path, f"playwright/driver/{to_path}")
+                    zip.write(from_path, f"rebrowser_playwright/driver/{to_path}")
             zip.writestr(
-                "playwright/driver/README.md",
+                "rebrowser_playwright/driver/README.md",
                 f"{wheel_bundle['wheel']} driver package",
             )
         os.remove(base_wheel_location)
@@ -206,10 +206,10 @@ class PlaywrightBDistWheelCommand(BDistWheelCommand):
         zip_name = zip_names_for_current_system.pop()
         ensure_driver_bundle(zip_name)
         zip_file = f"driver/playwright-{driver_version}-{zip_name}.zip"
-        if os.path.exists("playwright/driver"):
-            shutil.rmtree("playwright/driver")
+        if os.path.exists("rebrowser_playwright/driver"):
+            shutil.rmtree("rebrowser_playwright/driver")
         with zipfile.ZipFile(zip_file, "r") as zip:
-            extractall(zip, "playwright/driver")
+            extractall(zip, "rebrowser_playwright/driver")
 
 
 setup(
